@@ -7,7 +7,10 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "https://unilink-project.vercel.app",
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
