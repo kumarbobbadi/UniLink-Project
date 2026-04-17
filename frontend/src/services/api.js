@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '' });
+const api = axios.create({
+  baseURL: 'https://unilink-project-2.onrender.com/api'
+});
 
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('unilink_token');
