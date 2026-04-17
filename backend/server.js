@@ -3,14 +3,12 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+// Load environment variables for local development
 dotenv.config();
 
 const app = express();
 
-app.use(cors({
-  origin: "https://unilink-project.vercel.app",
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 // Routes
@@ -33,12 +31,24 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Start server immediately
+// Start server immediately regardless of MongoDB connection state
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Connect MongoDB separately
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err.message));
+// Connect to MongoDB Atlas/Local
+if (!process.env.MONGO_URI) {
+  console.error("CRITICAL ERROR: MONGO_URI is not defined.");
+} else {
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('MongoDB connected successfully'))
+    .catch(err => {
+      console.error('MongoDB connection error details:');
+      console.error('Message:', err.message);
+      // Provide a helpful hint
+      if (err.message.includes('bad auth')) {
+        console.error('Hint: Check your database username and password in the connection string.');
+      }
+      // Ensure we don't exit the process here so the server stays alive!
+    });
+}
